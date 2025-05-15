@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.validation.annotation.Validated;
-import ru.practicum.shareit.user.model.User;
 
 /**
  * TODO Sprint add-controllers.

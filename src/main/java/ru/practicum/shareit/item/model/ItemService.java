@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.model;
 
-import ru.practicum.shareit.booking.model.Statuses;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.Collection;

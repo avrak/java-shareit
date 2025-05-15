@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
-import ru.practicum.shareit.item.storage.ItemStorage;
 
 import java.util.Collection;
 
@@ -56,7 +55,7 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public Collection<ItemDto> getItemListByText(@RequestParam(name="text", required=true) String text) {
+    public Collection<ItemDto> getItemListByText(@RequestParam(name = "text", required = true) String text) {
         log.info("Показать все вещи с текстом={}", text);
 
         return itemService.getItemListByText(text);

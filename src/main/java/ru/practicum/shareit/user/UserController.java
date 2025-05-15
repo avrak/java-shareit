@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
@@ -31,6 +30,7 @@ public class UserController {
 
         return userService.addUser(user);
     }
+
     @PatchMapping("/{userId}")
     public UserDto update(
             @PathVariable(value = "userId", required = true) Long userId,

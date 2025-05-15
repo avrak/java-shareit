@@ -3,7 +3,6 @@ package ru.practicum.shareit.user.storage;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exception.model.NotFoundException;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.exception.model.ParameterNotValidException;
 
 import java.util.HashMap;
 
@@ -13,7 +12,7 @@ public class UserStorage {
     private final HashMap<Long, User> userListById;
     private final HashMap<String, User> userListByMail;
 
-    public UserStorage () {
+    public UserStorage() {
         userListById = new HashMap<>();
         userListByMail = new HashMap<>();
     }
