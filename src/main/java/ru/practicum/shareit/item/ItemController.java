@@ -3,8 +3,12 @@ package ru.practicum.shareit.item;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemWithDateTimeDto;
+import ru.practicum.shareit.item.service.CommentServiceImpl;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
 
 import java.util.Collection;
@@ -18,6 +22,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class ItemController {
     private final ItemServiceImpl itemService;
+    private final CommentServiceImpl commentService;
 
     @PostMapping
     public ItemDto addItem(
@@ -41,25 +46,34 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable(value = "itemId") Long itemId) {
+    public ItemWithDateTimeDto getItemById(@PathVariable(value = "itemId") Long itemId) {
         log.info("Показать вещь по id={}", itemId);
 
-        return itemService.getItemById(itemId);
+        return itemService.getItemWithComments(itemId);
     }
 
     @GetMapping
-    public Collection<ItemDto> getItemListByOwnerId(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<Collection<ItemWithDateTimeDto>> getItemListByOwnerId(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Показать все вещи пользователя с id={}", userId);
 
-        return itemService.getItemListByOwner(userId);
+        return ResponseEntity.ok().body(itemService.getItemListByOwner(userId));
     }
 
     @GetMapping("/search")
-    public Collection<ItemDto> getItemListByText(@RequestParam(name = "text", required = true) String text) {
+    public Collection<ItemWithDateTimeDto> getItemListByText(@RequestParam(name = "text", required = true) String text) {
         log.info("Показать все вещи с текстом={}", text);
 
         return itemService.getItemListByText(text);
     }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(
+            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @PathVariable(value = "itemId") Long itemId,
+            @RequestBody CommentDto commentDto
+    ) {
+        log.info("Добавить комментарий пользователя {} к вещи {}", userId, commentDto.getItemId());
+
+        return commentService.addComment(userId, itemId, commentDto);
+    }
 }
-
-
