@@ -1,9 +1,10 @@
 package ru.practicum.shareit.booking.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import ru.practicum.shareit.booking.model.Statuses;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
+
+import java.time.LocalDateTime;
 
 /**
  * TODO Sprint add-bookings.
@@ -11,9 +12,18 @@ import ru.practicum.shareit.user.model.User;
 @Data
 public class BookingDto {
     private long id; //уникальный идентификатор бронирования;
-    private long start; // дата и время начала бронирования;
-    private long end; // дата и время конца бронирования;
-    private Item item; // вещь, которую пользователь бронирует;
-    private User booker; // пользователь, который осуществляет бронирование;
+
+    @NotNull(message = "Время начала бронирования должно быть указано")
+    private LocalDateTime start; // дата и время начала бронирования;
+
+    @NotNull(message = "Время окончания бронирования должно быть указано")
+    private LocalDateTime end; // дата и время конца бронирования;
+
+    @NotNull(message = "Вещь для бронирования должна быть указана")
+    private Long itemId; // вещь, которую пользователь бронирует;
+
+    @NotNull(message = "Пользователь, бронирующий вещь, должен быть указан")
+    private Long booker;
+
     private Statuses status; // статус бронирования
 }

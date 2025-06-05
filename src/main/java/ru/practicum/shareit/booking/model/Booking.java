@@ -1,23 +1,40 @@
 package ru.practicum.shareit.booking.model;
 
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.model.User;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 /**
  * TODO Sprint add-controllers.
  */
-@Data
+@Entity
+@Table(name = "bookings")
 @Getter
 @Setter
 public class Booking {
-    long id; //уникальный идентификатор бронирования;
-    long start; // дата и время начала бронирования;
-    long end; // дата и время конца бронирования;
-    Item item; // вещь, которую пользователь бронирует;
-    User booker; // пользователь, который осуществляет бронирование;
-    Statuses status; // статус бронирования
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id; //уникальный идентификатор бронирования;
+
+    @NotNull(message = "Время начала бронирования должно быть указано")
+    @Column(name="started_at")
+    LocalDateTime start; // дата и время начала бронирования;
+
+    @NotNull(message = "Время окончания бронирования должно быть указано")
+    @Column(name="ended_at")
+    LocalDateTime end; // дата и время конца бронирования;
+
+    @NotNull(message = "Вещь для бронирования должна быть указана")
+    @Column(name="item_id")
+    Long item; // вещь, которую пользователь бронирует;
+
+    @NotNull(message = "Пользователь, бронирующий вещь, должен быть указан")
+    @Column(name="booker_id")
+    Long booker; // пользователь, который осуществляет бронирование;
+
+    String status; // статус бронирования
 }
