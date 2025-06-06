@@ -11,7 +11,7 @@ public interface BookingRepository  extends JpaRepository<Booking, Long> {
 
     public Optional<Booking> findBookingById(Long bookingId);
 
-    public Collection<Booking> findBookingByBookerAndStatus(Long bookerId, String status);
+    public Collection<Booking> findBookingByBooker(Long bookerId);
 
     @Query("""
         select b

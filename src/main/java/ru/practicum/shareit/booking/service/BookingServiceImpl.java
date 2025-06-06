@@ -121,12 +121,10 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Collection<BookingObjDto> getBookingListByBookerIdAndStatus(Long bookerId, String status) {
-        checkStatus(status);
-
+    public Collection<BookingObjDto> getBookingListByBookerId(Long bookerId) {
         ArrayList<BookingObjDto> bookingDtoList = new ArrayList<>();
 
-        for (Booking booking : bookingRepository.findBookingByBookerAndStatus(bookerId, status)) {
+        for (Booking booking : bookingRepository.findBookingByBooker(bookerId)) {
             Item item = itemRepository.findItemById(booking.getItem()).get();
             User booker = userRepository.findUserById(bookerId).get();
             bookingDtoList.add(BookingMapper.toBookingObjDto(

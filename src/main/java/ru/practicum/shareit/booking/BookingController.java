@@ -55,12 +55,11 @@ public class BookingController {
     }
 
     @GetMapping
-    public Collection<BookingObjDto> getBookingListByBookerIdAndStatus(
-            @RequestHeader("X-Sharer-User-Id") Long bookerId,
-            @PathVariable("state") String state
+    public Collection<BookingObjDto> getBookingListByBookerId(
+            @RequestHeader("X-Sharer-User-Id") Long bookerId
     ) {
-        log.info("Получить бронирования пользователя {} со статусом {}", bookerId, state);
-        return bookingService.getBookingListByBookerIdAndStatus(bookerId, state);
+        log.info("Получить бронирования пользователя {}", bookerId);
+        return bookingService.getBookingListByBookerId(bookerId);
     }
 
     @GetMapping("/owner")
