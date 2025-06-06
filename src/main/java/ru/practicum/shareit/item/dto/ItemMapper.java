@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.dto.BookingMapper;
@@ -11,7 +10,6 @@ import ru.practicum.shareit.item.model.Item;
 import java.util.Collection;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ItemMapper {
     public static ItemDto toItemDto(Item item) {
         ItemDto itemDto = new ItemDto();
@@ -54,8 +52,8 @@ public class ItemMapper {
         itemWithDateTimeDto.setAvailable(item.getAvailable());
         itemWithDateTimeDto.setOwner(item.getOwner());
         itemWithDateTimeDto.setRequest(item.getRequest());
-        itemWithDateTimeDto.setLastBooking(lastBooking == null ? null : BookingMapper.toBookingDto(lastBooking));
-        itemWithDateTimeDto.setNextBooking(nextBooking == null ? null : BookingMapper.toBookingDto(nextBooking));
+        itemWithDateTimeDto.setLastBooking(lastBooking.getId() == null ? null : BookingMapper.toBookingDto(lastBooking));
+        itemWithDateTimeDto.setNextBooking(nextBooking.getId() == null ? null : BookingMapper.toBookingDto(nextBooking));
         itemWithDateTimeDto.setComments(commentListDto.isEmpty() ? null : commentListDto);
 
         return itemWithDateTimeDto;

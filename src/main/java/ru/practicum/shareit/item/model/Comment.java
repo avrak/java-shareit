@@ -21,18 +21,18 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="item_id")
+    @Column(name = "item_id")
     @NotNull(message = "Вещь должна быть указана")
     private Long itemId;
 
-    @Column(name="user_id")
+    @Column(name = "user_id")
     @NotNull(message = "Комментатор должен быть указан")
     private Long user;
 
-    @Column(name="created_at")
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name="comment")
+    @Column(name = "comment")
     @NotNull(message = "Комментарий не должен быть пустым")
     private String text;
 

@@ -19,20 +19,20 @@ public class Item {
     private Long id; // уникальный идентификатор вещи;
 
     @NotNull(message = "Название вещи должно быть указано")
-    @Column(name="name")
+    @Column(name = "name")
     String name; // краткое название;
 
     @NotNull(message = "Описание вещи должно быть указано")
-    @Column(name="description")
+    @Column(name = "description")
     String description; // развёрнутое описание;
 
     @NotNull(message = "Доступность вещи должна быть указана")
-    @Column(name="available")
+    @Column(name = "available")
     Boolean available; // статус о том, доступна или нет вещь для аренды;
 
-    @Column(name="owner_id")
+    @Column(name = "owner_id")
     Long owner; // владелец вещи;
 
-    @Column(name="request_id")
+    @Column(name = "request_id")
     Long request; // если вещь была создана по запросу другого пользователя, то в этом поле будет храниться ссылка на соответствующий запрос.
 }
