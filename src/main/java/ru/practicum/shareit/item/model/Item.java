@@ -11,7 +11,9 @@ import lombok.ToString;
  */
 @Entity
 @Table(name = "items")
-@Getter @Setter @ToString
+@Getter
+@Setter
+@ToString
 //@Validated
 public class Item {
     @Id

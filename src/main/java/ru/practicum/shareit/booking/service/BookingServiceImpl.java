@@ -126,7 +126,7 @@ public class BookingServiceImpl implements BookingService {
 
         ArrayList<BookingObjDto> bookingDtoList = new ArrayList<>();
 
-        for(Booking booking : bookingRepository.findBookingByBookerAndStatus(bookerId, status)) {
+        for (Booking booking : bookingRepository.findBookingByBookerAndStatus(bookerId, status)) {
             Item item = itemRepository.findItemById(booking.getItem()).get();
             User booker = userRepository.findUserById(bookerId).get();
             bookingDtoList.add(BookingMapper.toBookingObjDto(

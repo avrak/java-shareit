@@ -4,25 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.model.ConflictException;
 import ru.practicum.shareit.exception.model.NotFoundException;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.storage.ItemRepository;
-import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 import ru.practicum.shareit.user.model.UserService;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-//    private final UserStorage userStorage;
-    private long newUserId;
 
     private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
 
     @Override
     public UserDto addUser(UserDto user) {
@@ -68,9 +60,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
-//        for (Item item : itemRepository.getItemListByOwnerId(userId)) {
-//            itemRepository.deleteById(item.getId());
-//        }
     }
 
 }
