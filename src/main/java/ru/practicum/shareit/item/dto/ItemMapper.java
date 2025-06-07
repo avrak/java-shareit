@@ -2,7 +2,12 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.booking.dto.BookingMapper;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+
+import java.util.Collection;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemMapper {
@@ -30,5 +35,27 @@ public class ItemMapper {
         item.setRequest(itemDto.getRequest());
 
         return item;
+    }
+
+    public static ItemWideDto toItemWideDto(
+            Item item,
+            Collection<Comment> comments,
+            Booking lastBooking,
+            Booking nextBooking
+    ) {
+        ItemWideDto itemWideDto = new ItemWideDto();
+        Collection<CommentDto> commentListDto = comments.stream().map(CommentMapper::toCommentDto).toList();
+
+        itemWideDto.setId(item.getId());
+        itemWideDto.setName(item.getName());
+        itemWideDto.setDescription(item.getDescription());
+        itemWideDto.setAvailable(item.getAvailable());
+        itemWideDto.setOwner(item.getOwner());
+        itemWideDto.setRequest(item.getRequest());
+        itemWideDto.setLastBooking(lastBooking.getId() == null ? null : BookingMapper.toBookingDto(lastBooking));
+        itemWideDto.setNextBooking(nextBooking.getId() == null ? null : BookingMapper.toBookingDto(nextBooking));
+        itemWideDto.setComments(commentListDto.isEmpty() ? null : commentListDto);
+
+        return itemWideDto;
     }
 }
