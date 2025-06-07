@@ -37,25 +37,25 @@ public class ItemMapper {
         return item;
     }
 
-    public static ItemWithDateTimeDto toItemWithDatesDto(
+    public static ItemWideDto toItemWideDto(
             Item item,
             Collection<Comment> comments,
             Booking lastBooking,
             Booking nextBooking
     ) {
-        ItemWithDateTimeDto itemWithDateTimeDto = new ItemWithDateTimeDto();
+        ItemWideDto itemWideDto = new ItemWideDto();
         Collection<CommentDto> commentListDto = comments.stream().map(CommentMapper::toCommentDto).toList();
 
-        itemWithDateTimeDto.setId(item.getId());
-        itemWithDateTimeDto.setName(item.getName());
-        itemWithDateTimeDto.setDescription(item.getDescription());
-        itemWithDateTimeDto.setAvailable(item.getAvailable());
-        itemWithDateTimeDto.setOwner(item.getOwner());
-        itemWithDateTimeDto.setRequest(item.getRequest());
-        itemWithDateTimeDto.setLastBooking(lastBooking.getId() == null ? null : BookingMapper.toBookingDto(lastBooking));
-        itemWithDateTimeDto.setNextBooking(nextBooking.getId() == null ? null : BookingMapper.toBookingDto(nextBooking));
-        itemWithDateTimeDto.setComments(commentListDto.isEmpty() ? null : commentListDto);
+        itemWideDto.setId(item.getId());
+        itemWideDto.setName(item.getName());
+        itemWideDto.setDescription(item.getDescription());
+        itemWideDto.setAvailable(item.getAvailable());
+        itemWideDto.setOwner(item.getOwner());
+        itemWideDto.setRequest(item.getRequest());
+        itemWideDto.setLastBooking(lastBooking.getId() == null ? null : BookingMapper.toBookingDto(lastBooking));
+        itemWideDto.setNextBooking(nextBooking.getId() == null ? null : BookingMapper.toBookingDto(nextBooking));
+        itemWideDto.setComments(commentListDto.isEmpty() ? null : commentListDto);
 
-        return itemWithDateTimeDto;
+        return itemWideDto;
     }
 }

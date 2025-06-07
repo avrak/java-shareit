@@ -7,7 +7,7 @@ import ru.practicum.shareit.booking.storage.BookingRepository;
 import ru.practicum.shareit.exception.model.ForbiddenException;
 import ru.practicum.shareit.exception.model.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemWithDateTimeDto;
+import ru.practicum.shareit.item.dto.ItemWideDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.ItemService;
@@ -27,12 +27,12 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
 
     @Override
-    public ItemWithDateTimeDto getItemById(Long itemId) {
+    public ItemWideDto getItemById(Long itemId) {
         Item item = itemRepository
                 .findItemById(itemId)
                 .orElseThrow(() -> new NotFoundException("Вещь с id=" + itemId + " не найдена"));
 
-        return ItemMapper.toItemWithDatesDto(
+        return ItemMapper.toItemWideDto(
                 item,
                 commentRepository.findCommentsByItemId(itemId),
                 bookingRepository.getLastEndedBooking(item.getId()).orElse(new Booking()),
@@ -79,11 +79,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Collection<ItemWithDateTimeDto> getItemListByOwner(Long ownerId) {
-        Collection<ItemWithDateTimeDto> itemWithDateTimeDtoList = new ArrayList<>();
+    public Collection<ItemWideDto> getItemListByOwner(Long ownerId) {
+        Collection<ItemWideDto> itemWideDtoList = new ArrayList<>();
 
         for (Item item : itemRepository.findItemListByOwner(ownerId)) {
-            itemWithDateTimeDtoList.add(ItemMapper.toItemWithDatesDto(
+            itemWideDtoList.add(ItemMapper.toItemWideDto(
                     item,
                     commentRepository.findCommentsByItemId(item.getId()),
                     bookingRepository.getLastEndedBooking(item.getId()).orElse(new Booking()),
@@ -92,20 +92,20 @@ public class ItemServiceImpl implements ItemService {
             );
         }
 
-        return itemWithDateTimeDtoList;
+        return itemWideDtoList;
     }
 
     @Override
-    public Collection<ItemWithDateTimeDto> getItemListByText(String text) {
-        Collection<ItemWithDateTimeDto> itemWithDateTimeDtoList = new ArrayList<>();
+    public Collection<ItemWideDto> getItemListByText(String text) {
+        Collection<ItemWideDto> itemWideDtoList = new ArrayList<>();
 
         if (text.isEmpty()) {
-            return itemWithDateTimeDtoList;
+            return itemWideDtoList;
         }
 
         for (Item item : itemRepository.findItemListByText(text)) {
 
-            itemWithDateTimeDtoList.add(ItemMapper.toItemWithDatesDto(
+            itemWideDtoList.add(ItemMapper.toItemWideDto(
                     item,
                     commentRepository.findCommentsByItemId(item.getId()),
                     bookingRepository.getLastEndedBooking(item.getId()).orElse(new Booking()),
@@ -114,7 +114,7 @@ public class ItemServiceImpl implements ItemService {
             );
         }
 
-        return itemWithDateTimeDtoList;
+        return itemWideDtoList;
     }
 
     @Override
@@ -125,12 +125,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemWithDateTimeDto getItemWithComments(Long itemId) {
+    public ItemWideDto getItemWithComments(Long itemId) {
         Item item = itemRepository.findItemById(itemId).orElseThrow(
                         () -> new NotFoundException("Вещь с id=" + itemId + " не найдена")
         );
 
-        return ItemMapper.toItemWithDatesDto(
+        return ItemMapper.toItemWideDto(
                 item,
                 commentRepository.findCommentsByItemId(itemId),
                 bookingRepository.getLastEndedBooking(item.getId()).orElse(new Booking()),

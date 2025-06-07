@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemWithDateTimeDto;
+import ru.practicum.shareit.item.dto.ItemWideDto;
 import ru.practicum.shareit.item.service.CommentServiceImpl;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
 
@@ -46,21 +46,21 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemWithDateTimeDto getItemById(@PathVariable(value = "itemId") Long itemId) {
+    public ItemWideDto getItemById(@PathVariable(value = "itemId") Long itemId) {
         log.info("Показать вещь по id={}", itemId);
 
         return itemService.getItemWithComments(itemId);
     }
 
     @GetMapping
-    public ResponseEntity<Collection<ItemWithDateTimeDto>> getItemListByOwnerId(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<Collection<ItemWideDto>> getItemListByOwnerId(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Показать все вещи пользователя с id={}", userId);
 
         return ResponseEntity.ok().body(itemService.getItemListByOwner(userId));
     }
 
     @GetMapping("/search")
-    public Collection<ItemWithDateTimeDto> getItemListByText(@RequestParam(name = "text", required = true) String text) {
+    public Collection<ItemWideDto> getItemListByText(@RequestParam(name = "text", required = true) String text) {
         log.info("Показать все вещи с текстом={}", text);
 
         return itemService.getItemListByText(text);
