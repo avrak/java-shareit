@@ -2,7 +2,9 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.Statuses;
 import ru.practicum.shareit.booking.storage.BookingRepository;
 import ru.practicum.shareit.exception.model.ForbiddenException;
 import ru.practicum.shareit.exception.model.NotFoundException;
@@ -15,6 +17,7 @@ import ru.practicum.shareit.item.storage.CommentRepository;
 import ru.practicum.shareit.item.storage.ItemRepository;
 import ru.practicum.shareit.user.storage.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -32,11 +35,16 @@ public class ItemServiceImpl implements ItemService {
                 .findItemById(itemId)
                 .orElseThrow(() -> new NotFoundException("Вещь с id=" + itemId + " не найдена"));
 
+        LocalDateTime now = LocalDateTime.now();
+
         return ItemMapper.toItemWideDto(
                 item,
                 commentRepository.findCommentsByItemId(itemId),
-                bookingRepository.getLastEndedBooking(item.getId()).orElse(new Booking()),
-                bookingRepository.getNextBooking(item.getId()).orElse(new Booking())
+                bookingRepository.findFirstOneByItemAndStatusAndEndBeforeOrderByEndDesc(
+                        item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking()),
+                bookingRepository.findFirstOneByItemAndStatusAndStartAfterOrderByStartAsc(
+                        item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking())
+
         );
     }
 
@@ -82,12 +90,16 @@ public class ItemServiceImpl implements ItemService {
     public Collection<ItemWideDto> getItemListByOwner(Long ownerId) {
         Collection<ItemWideDto> itemWideDtoList = new ArrayList<>();
 
+        LocalDateTime now = LocalDateTime.now();
+
         for (Item item : itemRepository.findItemListByOwner(ownerId)) {
             itemWideDtoList.add(ItemMapper.toItemWideDto(
                     item,
                     commentRepository.findCommentsByItemId(item.getId()),
-                    bookingRepository.getLastEndedBooking(item.getId()).orElse(new Booking()),
-                    bookingRepository.getNextBooking(item.getId()).orElse(new Booking())
+                    bookingRepository.findFirstOneByItemAndStatusAndEndBeforeOrderByEndDesc(
+                            item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking()),
+                    bookingRepository.findFirstOneByItemAndStatusAndStartAfterOrderByStartAsc(
+                            item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking())
                     )
             );
         }
@@ -103,13 +115,17 @@ public class ItemServiceImpl implements ItemService {
             return itemWideDtoList;
         }
 
+        LocalDateTime now = LocalDateTime.now();
+
         for (Item item : itemRepository.findItemListByText(text)) {
 
             itemWideDtoList.add(ItemMapper.toItemWideDto(
                     item,
                     commentRepository.findCommentsByItemId(item.getId()),
-                    bookingRepository.getLastEndedBooking(item.getId()).orElse(new Booking()),
-                    bookingRepository.getNextBooking(item.getId()).orElse(new Booking())
+                    bookingRepository.findFirstOneByItemAndStatusAndEndBeforeOrderByEndDesc(
+                            item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking()),
+                    bookingRepository.findFirstOneByItemAndStatusAndStartAfterOrderByStartAsc(
+                            item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking())
                     )
             );
         }
@@ -125,16 +141,21 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ItemWideDto getItemWithComments(Long itemId) {
         Item item = itemRepository.findItemById(itemId).orElseThrow(
                         () -> new NotFoundException("Вещь с id=" + itemId + " не найдена")
         );
 
+        LocalDateTime now = LocalDateTime.now();
+
         return ItemMapper.toItemWideDto(
                 item,
                 commentRepository.findCommentsByItemId(itemId),
-                bookingRepository.getLastEndedBooking(item.getId()).orElse(new Booking()),
-                bookingRepository.getNextBooking(item.getId()).orElse(new Booking())
+                bookingRepository.findFirstOneByItemAndStatusAndEndBeforeOrderByEndDesc(
+                        item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking()),
+                bookingRepository.findFirstOneByItemAndStatusAndStartAfterOrderByStartAsc(
+                        item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking())
         );
     }
 }

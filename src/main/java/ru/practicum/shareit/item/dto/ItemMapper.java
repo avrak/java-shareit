@@ -7,6 +7,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -52,6 +53,7 @@ public class ItemMapper {
         itemWideDto.setAvailable(item.getAvailable());
         itemWideDto.setOwner(item.getOwner());
         itemWideDto.setRequest(item.getRequest());
+        itemWideDto.setNow(LocalDateTime.now());
         itemWideDto.setLastBooking(lastBooking.getId() == null ? null : BookingMapper.toBookingDto(lastBooking));
         itemWideDto.setNextBooking(nextBooking.getId() == null ? null : BookingMapper.toBookingDto(nextBooking));
         itemWideDto.setComments(commentListDto.isEmpty() ? null : commentListDto);

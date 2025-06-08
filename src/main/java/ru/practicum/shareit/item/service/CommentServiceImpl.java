@@ -28,7 +28,7 @@ public class CommentServiceImpl implements CommentService {
     public CommentDto addComment(Long userId, Long itemId, CommentDto commentDto) {
         Optional<Booking> bookingOptional = bookingRepository.findByItemAndBooker(itemId, userId);
         if (bookingOptional.isEmpty()
-            || bookingOptional.get().getStart().isAfter(LocalDateTime.now())
+            || bookingOptional.get().getEnd().isAfter(LocalDateTime.now())
             || !bookingOptional.get().getStatus().equals(Statuses.APPROVED.name())
         ) {
             throw new ParameterNotValidException("Только пользователи использовавшие вещь могут оставлять комментарии");
