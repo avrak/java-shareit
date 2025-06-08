@@ -33,7 +33,6 @@ public class Booking {
     Long item; // вещь, которую пользователь бронирует;
 
     @NotNull(message = "Пользователь, бронирующий вещь, должен быть указан")
-    @Column(name = "booker_id")
     Long booker; // пользователь, который осуществляет бронирование;
 
     String status; // статус бронирования

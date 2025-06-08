@@ -6,7 +6,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 
-//@RequiredArgsConstructor
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

@@ -142,20 +142,29 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public ItemWideDto getItemWithComments(Long itemId) {
+    public ItemWideDto getItemWithComments(Long userId, Long itemId) {
         Item item = itemRepository.findItemById(itemId).orElseThrow(
                         () -> new NotFoundException("Вещь с id=" + itemId + " не найдена")
         );
 
         LocalDateTime now = LocalDateTime.now();
 
+        Booking lastBooking = new Booking();
+        Booking nextBooking = new Booking();
+
+        if (userId.equals(item.getOwner())) {
+            lastBooking = bookingRepository.findFirstOneByItemAndStatusAndEndBeforeOrderByEndDesc(
+                    item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking());
+
+             nextBooking = bookingRepository.findFirstOneByItemAndStatusAndStartAfterOrderByStartAsc(
+                    item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking());
+        }
+
         return ItemMapper.toItemWideDto(
                 item,
                 commentRepository.findCommentsByItemId(itemId),
-                bookingRepository.findFirstOneByItemAndStatusAndEndBeforeOrderByEndDesc(
-                        item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking()),
-                bookingRepository.findFirstOneByItemAndStatusAndStartAfterOrderByStartAsc(
-                        item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking())
+                lastBooking,
+                nextBooking
         );
     }
 }

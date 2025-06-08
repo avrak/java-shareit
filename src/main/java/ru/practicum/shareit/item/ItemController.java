@@ -46,10 +46,13 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemWideDto getItemById(@PathVariable(value = "itemId") Long itemId) {
-        log.info("Показать вещь по id={}", itemId);
+    public ItemWideDto getItemById(
+            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @PathVariable(value = "itemId") Long itemId
+    ) {
+        log.info("Показать вещь по id={} пользователю {}", itemId, userId);
 
-        return itemService.getItemWithComments(itemId);
+        return itemService.getItemWithComments(userId, itemId);
     }
 
     @GetMapping
