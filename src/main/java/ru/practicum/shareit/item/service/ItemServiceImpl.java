@@ -40,9 +40,9 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.toItemWideDto(
                 item,
                 commentRepository.findCommentsByItemId(itemId),
-                bookingRepository.findFirstOneByItemAndStatusAndEndBeforeOrderByEndDesc(
+                bookingRepository.findFirstOneByItemIdAndStatusAndEndBeforeOrderByEndDesc(
                         item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking()),
-                bookingRepository.findFirstOneByItemAndStatusAndStartAfterOrderByStartAsc(
+                bookingRepository.findFirstOneByItemIdAndStatusAndStartAfterOrderByStartAsc(
                         item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking())
 
         );
@@ -96,9 +96,9 @@ public class ItemServiceImpl implements ItemService {
             itemWideDtoList.add(ItemMapper.toItemWideDto(
                     item,
                     commentRepository.findCommentsByItemId(item.getId()),
-                    bookingRepository.findFirstOneByItemAndStatusAndEndBeforeOrderByEndDesc(
+                    bookingRepository.findFirstOneByItemIdAndStatusAndEndBeforeOrderByEndDesc(
                             item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking()),
-                    bookingRepository.findFirstOneByItemAndStatusAndStartAfterOrderByStartAsc(
+                    bookingRepository.findFirstOneByItemIdAndStatusAndStartAfterOrderByStartAsc(
                             item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking())
                     )
             );
@@ -122,9 +122,9 @@ public class ItemServiceImpl implements ItemService {
             itemWideDtoList.add(ItemMapper.toItemWideDto(
                     item,
                     commentRepository.findCommentsByItemId(item.getId()),
-                    bookingRepository.findFirstOneByItemAndStatusAndEndBeforeOrderByEndDesc(
+                    bookingRepository.findFirstOneByItemIdAndStatusAndEndBeforeOrderByEndDesc(
                             item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking()),
-                    bookingRepository.findFirstOneByItemAndStatusAndStartAfterOrderByStartAsc(
+                    bookingRepository.findFirstOneByItemIdAndStatusAndStartAfterOrderByStartAsc(
                             item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking())
                     )
             );
@@ -153,10 +153,10 @@ public class ItemServiceImpl implements ItemService {
         Booking nextBooking = new Booking();
 
         if (userId.equals(item.getOwner())) {
-            lastBooking = bookingRepository.findFirstOneByItemAndStatusAndEndBeforeOrderByEndDesc(
+            lastBooking = bookingRepository.findFirstOneByItemIdAndStatusAndEndBeforeOrderByEndDesc(
                     item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking());
 
-             nextBooking = bookingRepository.findFirstOneByItemAndStatusAndStartAfterOrderByStartAsc(
+             nextBooking = bookingRepository.findFirstOneByItemIdAndStatusAndStartAfterOrderByStartAsc(
                     item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking());
         }
 

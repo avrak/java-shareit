@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.BookingObjDto;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
 
 import java.util.Collection;
@@ -20,23 +19,17 @@ public class BookingController {
     private final BookingServiceImpl bookingService;
 
     @PostMapping
-    public BookingObjDto saveBooking(
+    public BookingDto saveBooking(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestBody BookingDto bookingDto
     ) {
         log.info("Создать бронирование");
 
-        BookingObjDto bookingObj = bookingService.saveBooking(userId, bookingDto);
-        try {
-            return bookingObj;
-        } catch (Exception e) {
-            log.info(e.getMessage());
-            throw new RuntimeException(e);
-        }
+        return bookingService.saveBooking(userId, bookingDto);
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingObjDto approveBookingById(
+    public BookingDto approveBookingById(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable("bookingId") Long bookingId,
             @RequestParam(name = "approved", required = true) Boolean status
@@ -46,7 +39,7 @@ public class BookingController {
     }
 
     @GetMapping("/{bookingId}")
-    public BookingObjDto getBookingById(
+    public BookingDto getBookingById(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable("bookingId") Long bookingId
     ) {
@@ -55,7 +48,7 @@ public class BookingController {
     }
 
     @GetMapping
-    public Collection<BookingObjDto> getBookingListByBookerId(
+    public Collection<BookingDto> getBookingListByBookerId(
             @RequestHeader("X-Sharer-User-Id") Long bookerId
     ) {
         log.info("Получить бронирования пользователя {}", bookerId);
@@ -63,7 +56,7 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public Collection<BookingObjDto> getBookingListByOwnerIdAndStatus(
+    public Collection<BookingDto> getBookingListByOwnerIdAndStatus(
             @RequestHeader("X-Sharer-User-Id") Long bookerId,
             @PathVariable("state") String state
     ) {

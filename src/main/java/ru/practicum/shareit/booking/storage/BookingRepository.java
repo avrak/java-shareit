@@ -12,12 +12,12 @@ public interface BookingRepository  extends JpaRepository<Booking, Long> {
 
     Optional<Booking> findBookingById(Long bookingId);
 
-    Collection<Booking> findBookingByBooker(Long bookerId);
+    Collection<Booking> findBookingByBookerId(Long bookerId);
 
     @Query("""
         select b
           from Item i
-          join Booking b on b.item = i.id
+          join Booking b on b.itemId = i.id
          where i.owner = ?1
            and b.status = 'APPROVED'
          order by b.end desc
@@ -25,11 +25,11 @@ public interface BookingRepository  extends JpaRepository<Booking, Long> {
     Collection<Booking> findBookingListByOwnerAndStatus(Long ownerId, String status);
 
 
-    Optional<Booking> findFirstOneByItemAndStatusAndEndBeforeOrderByEndDesc(Long itemId, String status,
-                                                                                     LocalDateTime end);
+    Optional<Booking> findFirstOneByItemIdAndStatusAndEndBeforeOrderByEndDesc(Long itemId, String status,
+                                                                              LocalDateTime end);
 
-    Optional<Booking> findFirstOneByItemAndStatusAndStartAfterOrderByStartAsc(Long itemId, String status,
-                                                                                     LocalDateTime end);
+    Optional<Booking> findFirstOneByItemIdAndStatusAndStartAfterOrderByStartAsc(Long itemId, String status,
+                                                                                LocalDateTime end);
 
-    Optional<Booking> findByItemAndBooker(Long itemId, Long bookerId);
+    Optional<Booking> findByItemIdAndBookerId(Long itemId, Long bookerId);
 }

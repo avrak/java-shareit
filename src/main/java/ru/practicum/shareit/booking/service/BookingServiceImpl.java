@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
-import ru.practicum.shareit.booking.dto.BookingObjDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingService;
 import ru.practicum.shareit.booking.model.Statuses;
@@ -21,7 +20,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 
 @Service
@@ -33,7 +31,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional
     @Override
-    public BookingObjDto saveBooking(Long userId, BookingDto bookingDto) {
+    public BookingDto saveBooking(Long userId, BookingDto bookingDto) {
 
         if (bookingDto.getStart() == null || bookingDto.getEnd() == null) {
             throw new ParameterNotValidException("Время начала и окончания бронирования должны быть заданы");
@@ -63,23 +61,22 @@ public class BookingServiceImpl implements BookingService {
             throw new ParameterNotValidException("Вещь с id=" + bookingDto.getItemId() + " недоступна");
         }
 
-        bookingDto.setBooker(userId);
+        bookingDto.setBookerId(userId);
         bookingDto.setStatus(Statuses.WAITING);
-        return BookingMapper.toBookingObjDto(
-                bookingRepository.save(BookingMapper.toBooking(bookingDto)),
-                ItemMapper.toItemDto(item),
-                UserMapper.toUserDto(booker)
-        );
+        bookingDto.setItem(ItemMapper.toItemDto(item));
+        bookingDto.setBooker(UserMapper.toUserDto(booker));
+
+        return BookingMapper.toBookingDto(bookingRepository.save(BookingMapper.toBooking(bookingDto)));
     }
 
     @Override
-    public BookingObjDto approveBookingById(Long userId, Long bookingId, Boolean status) {
+    public BookingDto approveBookingById(Long userId, Long bookingId, Boolean status) {
         Booking booking = bookingRepository
                 .findBookingById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Бронирование с id=" + bookingId + " не найдено"));
 
         Item item = itemRepository
-                .findItemById(booking.getItem())
+                .findItemById(booking.getItem().getId())
                 .orElseThrow(() -> new NotFoundException("Вещь с id=" + booking.getItem() + " не найдена"));
 
         if (!item.getOwner().equals(userId)) {
@@ -89,71 +86,34 @@ public class BookingServiceImpl implements BookingService {
         booking.setStatus(status ? Statuses.APPROVED.name() : Statuses.REJECTED.name());
         bookingRepository.save(booking);
 
-        return BookingMapper.toBookingObjDto(
-                booking,
-                ItemMapper.toItemDto(item),
-                UserMapper.toUserDto(userRepository.findUserById(booking.getBooker()).get())
-        );
+        return BookingMapper.toBookingDto(booking);
     }
 
     @Override
-    public BookingObjDto getBookingById(Long userId, Long bookingId) {
+    public BookingDto getBookingById(Long userId, Long bookingId) {
         Booking booking = bookingRepository
                 .findBookingById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Бронирование с id=" + bookingId + " не найдено"));
 
-
-        Item item = itemRepository
-                .findItemById(booking.getItem())
-                .orElseThrow(() -> new NotFoundException("Вещь для бронирования не найдена"));
-
-        if (!(userId.equals(booking.getBooker()) || userId.equals(item.getOwner()))) {
-            throw new ForbiddenException("Только владелец вещи или арендатор могут просматривать бронирование!");
-        }
-
-        User booker = userRepository.findUserById(booking.getBooker()).get();
-
-        return BookingMapper.toBookingObjDto(
-                booking,
-                ItemMapper.toItemDto(item),
-                UserMapper.toUserDto(booker)
-        );
+        return BookingMapper.toBookingDto(booking);
     }
 
     @Override
-    public Collection<BookingObjDto> getBookingListByBookerId(Long bookerId) {
-        ArrayList<BookingObjDto> bookingDtoList = new ArrayList<>();
-
-        for (Booking booking : bookingRepository.findBookingByBooker(bookerId)) {
-            Item item = itemRepository.findItemById(booking.getItem()).get();
-            User booker = userRepository.findUserById(bookerId).get();
-            bookingDtoList.add(BookingMapper.toBookingObjDto(
-                    booking,
-                    ItemMapper.toItemDto(item),
-                    UserMapper.toUserDto(booker))
-            );
-        }
-
-        return bookingDtoList;
+    public Collection<BookingDto> getBookingListByBookerId(Long bookerId) {
+        return bookingRepository.findBookingByBookerId(bookerId)
+                .stream()
+                .map(BookingMapper::toBookingDto)
+                .toList();
     }
 
     @Override
-    public Collection<BookingObjDto> getBookingListByOwnerIdAndStatus(Long ownerId, String status) {
+    public Collection<BookingDto> getBookingListByOwnerIdAndStatus(Long ownerId, String status) {
         checkStatus(status);
 
-        ArrayList<BookingObjDto> bookingDtoList = new ArrayList<>();
-
-        for (Booking booking : bookingRepository.findBookingListByOwnerAndStatus(ownerId, status)) {
-            Item item = itemRepository.findItemById(booking.getItem()).get();
-            User booker = userRepository.findUserById(booking.getBooker()).get();
-            bookingDtoList.add(BookingMapper.toBookingObjDto(
-                    booking,
-                    ItemMapper.toItemDto(item),
-                    UserMapper.toUserDto(booker))
-            );
-        }
-
-        return bookingDtoList;
+        return bookingRepository.findBookingListByOwnerAndStatus(ownerId, status)
+                .stream()
+                .map(BookingMapper::toBookingDto)
+                .toList();
     }
 
     private void checkStatus(String status) {

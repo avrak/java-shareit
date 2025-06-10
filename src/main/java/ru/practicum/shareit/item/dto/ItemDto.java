@@ -3,15 +3,11 @@ package ru.practicum.shareit.item.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * TODO Sprint add-controllers.
  */
 @Data
-@Getter
-@Setter
 public class ItemDto {
     private long id; // уникальный идентификатор вещи;
     @NotBlank(message = "Название вещи должно быть указано")

@@ -3,6 +3,8 @@ package ru.practicum.shareit.booking.dto;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import ru.practicum.shareit.booking.model.Statuses;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 
@@ -23,7 +25,10 @@ public class BookingDto {
     private Long itemId; // вещь, которую пользователь бронирует;
 
     @NotNull(message = "Пользователь, бронирующий вещь, должен быть указан")
-    private Long booker;
+    private Long bookerId;
+
+    ItemDto item;
+    UserDto booker;
 
     private Statuses status; // статус бронирования
 }

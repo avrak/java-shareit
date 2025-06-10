@@ -26,7 +26,7 @@ public class CommentServiceImpl implements CommentService {
     public final BookingRepository bookingRepository;
 
     public CommentDto addComment(Long userId, Long itemId, CommentDto commentDto) {
-        Optional<Booking> bookingOptional = bookingRepository.findByItemAndBooker(itemId, userId);
+        Optional<Booking> bookingOptional = bookingRepository.findByItemIdAndBookerId(itemId, userId);
         if (bookingOptional.isEmpty()
             || bookingOptional.get().getEnd().isAfter(LocalDateTime.now())
             || !bookingOptional.get().getStatus().equals(Statuses.APPROVED.name())
