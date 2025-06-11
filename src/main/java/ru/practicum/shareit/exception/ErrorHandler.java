@@ -39,4 +39,13 @@ public class ErrorHandler {
                 "Конфликт данных", e.getReason()
         );
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ru.practicum.shareit.exception.model.ErrorResponse handleForbiddenException(final Throwable e) {
+        return new ErrorResponse(
+                "Конфликт данных", e.getMessage()
+        );
+    }
+
 }

@@ -2,47 +2,70 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.Statuses;
+import ru.practicum.shareit.booking.storage.BookingRepository;
 import ru.practicum.shareit.exception.model.ForbiddenException;
+import ru.practicum.shareit.exception.model.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemWideDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.model.ItemService;
-import ru.practicum.shareit.item.storage.ItemStorage;
-import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.storage.UserStorage;
+import ru.practicum.shareit.item.storage.CommentRepository;
+import ru.practicum.shareit.item.storage.ItemRepository;
+import ru.practicum.shareit.user.storage.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
-    private final ItemStorage itemStorage;
-    private final UserStorage userStorage;
-    private long newItemId = 0;
+    private final BookingRepository bookingRepository;
+    private final ItemRepository itemRepository;
+    private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
 
     @Override
-    public ItemDto getItemById(Long itemId) {
-        return ItemMapper.toItemDto(itemStorage.getItemById(itemId));
+    public ItemWideDto getItemById(Long itemId) {
+        Item item = itemRepository
+                .findItemById(itemId)
+                .orElseThrow(() -> new NotFoundException("Вещь с id=" + itemId + " не найдена"));
+
+        LocalDateTime now = LocalDateTime.now();
+
+        return ItemMapper.toItemWideDto(
+                item,
+                commentRepository.findCommentsByItemId(itemId),
+                bookingRepository.findFirstOneByItemIdAndStatusAndEndBeforeOrderByEndDesc(
+                        item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking()),
+                bookingRepository.findFirstOneByItemIdAndStatusAndStartAfterOrderByStartAsc(
+                        item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking())
+
+        );
     }
 
     @Override
     public ItemDto addItem(Long userId, ItemDto itemDto) {
-        if (itemDto.getOwner() == null) {
-            itemDto.setOwner(userId);
-        } else if (!userId.equals(itemDto.getOwner())) {
-            throw new ForbiddenException("Только владелец может добавить вещь!");
-        }
+        itemDto.setOwner(userRepository
+                .findUserById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id=" + " не найден"))
+                .getId()
+        );
 
-        User user = userStorage.getUserById(itemDto.getOwner());
-
-        itemDto.setId(newItemId++);
-        return saveItem(itemDto);
+        return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto)));
     }
 
     @Override
     public ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto) {
-        ItemDto currentItemDto = ItemMapper.toItemDto(itemStorage.getItemById(itemId));
+        ItemDto currentItemDto = ItemMapper.toItemDto(
+                itemRepository.findItemById(itemId).orElseThrow(
+                        () -> new NotFoundException("Вещь с id=" + itemId + " не найдена")
+                )
+        );
 
         if (!userId.equals(currentItemDto.getOwner())) {
             throw new ForbiddenException("Только владелец может обновить вещь!");
@@ -60,37 +83,88 @@ public class ItemServiceImpl implements ItemService {
             currentItemDto.setAvailable(itemDto.getAvailable());
         }
 
-        return saveItem(itemDto);
-    }
-
-    private ItemDto saveItem(ItemDto itemDto) {
-        return ItemMapper.toItemDto(itemStorage.saveItem(ItemMapper.toItem(itemDto)));
+        return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(currentItemDto)));
     }
 
     @Override
-    public Collection<ItemDto> getItemListByOwner(Long ownerId) {
-        Collection<ItemDto> itemDtoList = new ArrayList<>();
+    public Collection<ItemWideDto> getItemListByOwner(Long ownerId) {
+        Collection<ItemWideDto> itemWideDtoList = new ArrayList<>();
 
-        for (Item item : itemStorage.getItemListByOwnerId(ownerId)) {
-            itemDtoList.add(ItemMapper.toItemDto(item));
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Item item : itemRepository.findItemListByOwner(ownerId)) {
+            itemWideDtoList.add(ItemMapper.toItemWideDto(
+                    item,
+                    commentRepository.findCommentsByItemId(item.getId()),
+                    bookingRepository.findFirstOneByItemIdAndStatusAndEndBeforeOrderByEndDesc(
+                            item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking()),
+                    bookingRepository.findFirstOneByItemIdAndStatusAndStartAfterOrderByStartAsc(
+                            item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking())
+                    )
+            );
         }
 
-        return itemDtoList;
+        return itemWideDtoList;
     }
 
     @Override
-    public Collection<ItemDto> getItemListByText(String text) {
-        Collection<ItemDto> itemDtoList = new ArrayList<>();
+    public Collection<ItemWideDto> getItemListByText(String text) {
+        Collection<ItemWideDto> itemWideDtoList = new ArrayList<>();
 
-        for (Item item : itemStorage.getItemListByText(text)) {
-            itemDtoList.add(ItemMapper.toItemDto(item));
+        if (text.isEmpty()) {
+            return itemWideDtoList;
         }
 
-        return itemDtoList;
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Item item : itemRepository.findItemListByText(text)) {
+
+            itemWideDtoList.add(ItemMapper.toItemWideDto(
+                    item,
+                    commentRepository.findCommentsByItemId(item.getId()),
+                    bookingRepository.findFirstOneByItemIdAndStatusAndEndBeforeOrderByEndDesc(
+                            item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking()),
+                    bookingRepository.findFirstOneByItemIdAndStatusAndStartAfterOrderByStartAsc(
+                            item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking())
+                    )
+            );
+        }
+
+        return itemWideDtoList;
     }
 
     @Override
     public void deleteItem(Long itemId) {
-        itemStorage.deleteItemById(itemId);
+        Item item = itemRepository.findItemById(itemId).orElseThrow(
+                () -> new NotFoundException("Вещь с id=" + itemId + " не найдена"));
+        itemRepository.delete(item);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ItemWideDto getItemWithComments(Long userId, Long itemId) {
+        Item item = itemRepository.findItemById(itemId).orElseThrow(
+                        () -> new NotFoundException("Вещь с id=" + itemId + " не найдена")
+        );
+
+        LocalDateTime now = LocalDateTime.now();
+
+        Booking lastBooking = new Booking();
+        Booking nextBooking = new Booking();
+
+        if (userId.equals(item.getOwner())) {
+            lastBooking = bookingRepository.findFirstOneByItemIdAndStatusAndEndBeforeOrderByEndDesc(
+                    item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking());
+
+             nextBooking = bookingRepository.findFirstOneByItemIdAndStatusAndStartAfterOrderByStartAsc(
+                    item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking());
+        }
+
+        return ItemMapper.toItemWideDto(
+                item,
+                commentRepository.findCommentsByItemId(itemId),
+                lastBooking,
+                nextBooking
+        );
     }
 }
