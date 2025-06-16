@@ -4,12 +4,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.model.ItemRequestService;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 /**
  * TODO Sprint add-item-requests.
@@ -40,7 +38,7 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public Collection<ItemRequestDto> getAllItemRequests(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        log.info("Получить все запросы");
+        log.info("Пользователь с id={} получает все запросы", userId);
 
         return itemRequestService.getAllItemRequests();
     }

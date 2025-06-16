@@ -8,9 +8,9 @@ import java.util.Optional;
 
 public interface ItemRequestRepository  extends JpaRepository<ItemRequest, Long> {
 
-    public Optional<ItemRequest> findItemRequestById(Long id);
+    Optional<ItemRequest> findItemRequestById(Long id);
 
-    public Collection<ItemRequest> findItemRequestListByRequestorId(Long requestorId);
+    Collection<ItemRequest> findItemRequestListByRequestorId(Long requestorId);
 
 }
 
