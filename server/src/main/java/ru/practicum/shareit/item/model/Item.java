@@ -1,9 +1,7 @@
 package ru.practicum.shareit.item.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.util.Collection;
@@ -13,6 +11,8 @@ import java.util.Collection;
  */
 @Entity
 @Table(name = "items")
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
 @ToString

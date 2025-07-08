@@ -36,7 +36,7 @@ public class UserDtoTest {
 
         UserDto userDto = new UserDto(1L, name, email);
 
-         Set<ConstraintViolation<UserDto>> violations = validator.validate(userDto);
+        Set<ConstraintViolation<UserDto>> violations = validator.validate(userDto);
         assertTrue(violations.isEmpty());
     }
 

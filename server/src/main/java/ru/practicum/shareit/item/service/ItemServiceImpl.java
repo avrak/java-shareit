@@ -41,7 +41,6 @@ public class ItemServiceImpl implements ItemService {
 
         return ItemMapper.toItemWideDto(
                 item,
-//                commentRepository.findCommentsByItemId(itemId),
                 bookingRepository.findFirstOneByItemIdAndStatusAndEndBeforeOrderByEndDesc(
                         item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking()),
                 bookingRepository.findFirstOneByItemIdAndStatusAndStartAfterOrderByStartAsc(
@@ -107,7 +106,6 @@ public class ItemServiceImpl implements ItemService {
         for (Item item : itemRepository.findItemListByOwnerId(ownerId)) {
             itemWideDtoList.add(ItemMapper.toItemWideDto(
                     item,
-//                    commentRepository.findCommentsByItemId(item.getId()),
                     bookingRepository.findFirstOneByItemIdAndStatusAndEndBeforeOrderByEndDesc(
                             item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking()),
                     bookingRepository.findFirstOneByItemIdAndStatusAndStartAfterOrderByStartAsc(
@@ -133,7 +131,6 @@ public class ItemServiceImpl implements ItemService {
 
             itemWideDtoList.add(ItemMapper.toItemWideDto(
                     item,
-//                    commentRepository.findCommentsByItemId(item.getId()),
                     bookingRepository.findFirstOneByItemIdAndStatusAndEndBeforeOrderByEndDesc(
                             item.getId(), Statuses.APPROVED.name(), now).orElse(new Booking()),
                     bookingRepository.findFirstOneByItemIdAndStatusAndStartAfterOrderByStartAsc(
@@ -174,7 +171,6 @@ public class ItemServiceImpl implements ItemService {
 
         return ItemMapper.toItemWideDto(
                 item,
-//                commentRepository.findCommentsByItemId(itemId),
                 lastBooking,
                 nextBooking
         );
