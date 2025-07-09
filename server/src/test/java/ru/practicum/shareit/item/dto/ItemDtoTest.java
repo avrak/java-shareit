@@ -1,4 +1,4 @@
-package ru.practicum.shareit.request.dto;
+package ru.practicum.shareit.item.dto;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
@@ -8,23 +8,18 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import ru.practicum.shareit.item.dto.ItemShortDto;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.request.dto.ItemRequestDto;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ItemRequestDtoTest {
+public class ItemDtoTest {
     private static ValidatorFactory validatorFactory;
     private static Validator validator;
     private final String name = "ItemRequestDtoTest";
     private final String email = name + "@example.com";
-    UserDto userDto = new UserDto(1L, name, email);
-    LocalDateTime createdAt = LocalDateTime.now();
 
     @BeforeAll
     static void beforeAll() {
@@ -38,35 +33,43 @@ public class ItemRequestDtoTest {
     }
 
     @Test
-    @DisplayName("Создать DTO запроса с корректными параметрами")
-    void itemRequestDto_valid() {
-        ItemRequestDto itemRequestDto = new ItemRequestDto(
+    @DisplayName("Создать DTO вещи с корректными данными")
+    void createItemDto_withCorrectData() {
+        ItemDto itemDto = new ItemDto(
                 1L,
-                "itemRequestDto_valid",
-                userDto,
-                createdAt,
-                new ArrayList<ItemShortDto>()
+                "ItemDtoTest",
+                "ItemDtoTest description",
+                true,
+                1L,
+                1L,
+                new ItemRequestDto()
         );
 
-        Set<ConstraintViolation<ItemRequestDto>> violations = validator.validate(itemRequestDto);
+        Set<ConstraintViolation<ItemDto>> violations = validator.validate(itemDto);
         assertTrue(violations.isEmpty());
     }
 
     @Test
-    @DisplayName("Создать DTO запроса с некорректными параметрами")
-    void itemRequestDto_nonValid() {
-        ItemRequestDto itemRequestDto = new ItemRequestDto(
+    @DisplayName("Создать DTO вещи с некорректными данными")
+    void createItemDto_withIncorrectData() {
+        ItemDto itemDto = new ItemDto(
                 1L,
-                "",
-                userDto,
-                createdAt,
-                new ArrayList<ItemShortDto>()
+                null,
+                null,
+                null,
+                1L,
+                1L,
+                new ItemRequestDto()
         );
 
-        Set<ConstraintViolation<ItemRequestDto>> violations = validator.validate(itemRequestDto);
+        Set<ConstraintViolation<ItemDto>> violations = validator.validate(itemDto);
 
         assertFalse(violations.isEmpty());
         assertTrue(violations.stream()
+                .anyMatch(v -> v.getPropertyPath().toString().equals("name")));
+        assertTrue(violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("description")));
+        assertTrue(violations.stream()
+                .anyMatch(v -> v.getPropertyPath().toString().equals("available")));
     }
 }

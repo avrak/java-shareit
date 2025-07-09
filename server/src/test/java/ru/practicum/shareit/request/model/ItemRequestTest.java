@@ -21,8 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ItemRequestTest {
     private static ValidatorFactory validatorFactory;
     private static Validator validator;
-    private final static String name = "UserServiceTest";
-    private final static String email = name + "@example.com";
+    private final String name = "UserServiceTest";
+    private final String email = name + "@example.com";
     private final LocalDateTime createdAt = LocalDateTime.now();
 
     User user = new User(1L, name, email);

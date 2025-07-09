@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import ru.practicum.shareit.request.model.ItemRequest;
 
@@ -16,19 +18,21 @@ import java.util.Collection;
 @Getter
 @Setter
 @ToString
-//@Validated
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // уникальный идентификатор вещи;
 
     @Column(name = "name", nullable = false)
+    @NotBlank(message = "Название вещи должно быть указано")
     private String name; // краткое название;
 
     @Column(name = "description")
+    @NotBlank(message = "Описание вещи должно быть указано")
     private String description; // развёрнутое описание;
 
     @Column(name = "available", nullable = false)
+    @NotNull(message = "Доступность вещи должна быть указана")
     private Boolean available; // статус о том, доступна или нет вещь для аренды;
 
     @Column(name = "owner_id")

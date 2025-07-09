@@ -29,8 +29,6 @@ import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.Month;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,13 +36,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ItemServiceTest {
-    private final static String name = "UserServiceTest";
-    private final static String email = name + "@example.com";
+    private final String name = "UserServiceTest";
+    private final String email = name + "@example.com";
     private final LocalDateTime createdAt = LocalDateTime.now();
 
     User user;
@@ -190,11 +187,13 @@ public class ItemServiceTest {
     @DisplayName("Найти существующую вещь")
     void getItemById_existing() {
         when(itemRepository.findItemById(any(Long.class))).thenReturn(Optional.of(item));
+
         when(bookingRepository.findFirstOneByItemIdAndStatusAndEndBeforeOrderByEndDesc(
                 any(Long.class),
                 any(String.class),
                 any(LocalDateTime.now().getClass()))
         ).thenReturn(Optional.of(bookingLast));
+
         when(bookingRepository.findFirstOneByItemIdAndStatusAndStartAfterOrderByStartAsc(
                 any(Long.class),
                 any(String.class),
@@ -303,4 +302,129 @@ public class ItemServiceTest {
         verify(itemRepository).save(any(Item.class));
     }
 
+    @Test
+    @DisplayName("Найти вещи пользователя")
+    void getItemListByOwner_test() {
+        Item item2 = new Item();
+        item2.setId(2L);
+        item2.setName("ItemServiceTest 2");
+        item2.setDescription("ItemServiceTest description 2");
+        item2.setOwnerId(1L);
+        item2.setAvailable(true);
+        item2.setRequestId(30L);
+        item2.setComments(List.of(new Comment()));
+
+        when(itemRepository.findItemListByOwnerId(any(Long.class))).thenReturn(List.of(item, item2));
+
+        when(bookingRepository.findFirstOneByItemIdAndStatusAndEndBeforeOrderByEndDesc(
+                any(Long.class),
+                any(String.class),
+                any(LocalDateTime.now().getClass()))
+        ).thenReturn(Optional.of(bookingLast));
+
+        when(bookingRepository.findFirstOneByItemIdAndStatusAndStartAfterOrderByStartAsc(
+                any(Long.class),
+                any(String.class),
+                any(LocalDateTime.now().getClass()))
+        ).thenReturn(Optional.of(bookingNext));
+
+        assertEquals(2, itemService.getItemListByOwner(1L).size());
+        verify(itemRepository).findItemListByOwnerId(any(Long.class));
+        verify(bookingRepository, atLeastOnce()).findFirstOneByItemIdAndStatusAndEndBeforeOrderByEndDesc(
+                any(Long.class),
+                any(String.class),
+                any(LocalDateTime.now().getClass())
+        );
+        verify(bookingRepository, atLeastOnce()).findFirstOneByItemIdAndStatusAndStartAfterOrderByStartAsc(
+                any(Long.class),
+                any(String.class),
+                any(LocalDateTime.now().getClass())
+        );
+    }
+
+    @Test
+    @DisplayName("Найти вещь по тексту")
+    void getItemListByText_test() {
+        Item item2 = new Item();
+        item2.setId(2L);
+        item2.setName("ItemServiceTest 2");
+        item2.setDescription("ItemServiceTest description 2");
+        item2.setOwnerId(1L);
+        item2.setAvailable(true);
+        item2.setRequestId(30L);
+        item2.setComments(List.of(new Comment()));
+
+        when(itemRepository.findItemListByText(any(String.class))).thenReturn(List.of(item, item2));
+
+        assertEquals(2, itemService.getItemListByText("ItemServiceTest").size());
+        verify(itemRepository).findItemListByText(any(String.class));
+        verify(bookingRepository, atLeastOnce()).findFirstOneByItemIdAndStatusAndEndBeforeOrderByEndDesc(
+                any(Long.class),
+                any(String.class),
+                any(LocalDateTime.now().getClass())
+        );
+        verify(bookingRepository, atLeastOnce()).findFirstOneByItemIdAndStatusAndStartAfterOrderByStartAsc(
+                any(Long.class),
+                any(String.class),
+                any(LocalDateTime.now().getClass())
+        );
+    }
+
+    @Test
+    @DisplayName("Удалить несуществующую вещь")
+    void deleteItem_nonExisting() {
+        when(itemRepository.findItemById(any(Long.class))).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> itemService.deleteItem(1L));
+        verify(itemRepository).findItemById(any(Long.class));
+    }
+
+    @Test
+    @DisplayName("Удалить существующую вещь")
+    void deleteItem_existing() {
+        when(itemRepository.findItemById(any(Long.class))).thenReturn(Optional.of(item));
+        itemService.deleteItem(1L);
+        verify(itemRepository).findItemById(any(Long.class));
+        verify(itemRepository).delete(any(Item.class));
+    }
+
+    @Test
+    @DisplayName("Найти несуществующую вещь, вернуть ответ с комментариями")
+    void getItemWithComments_nonExisting() {
+        when(itemRepository.findItemById(any(Long.class))).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> itemService.getItemWithComments(1L, 1L));
+        verify(itemRepository).findItemById(any(Long.class));
+    }
+
+    @Test
+    @DisplayName("Найти существующую вещь, вернуть ответ с комментариями")
+    void getItemWithComments_existing() {
+        when(itemRepository.findItemById(any(Long.class))).thenReturn(Optional.of(item));
+
+        when(bookingRepository.findFirstOneByItemIdAndStatusAndEndBeforeOrderByEndDesc(
+                any(Long.class),
+                any(String.class),
+                any(LocalDateTime.now().getClass()))
+        ).thenReturn(Optional.of(bookingLast));
+
+        when(bookingRepository.findFirstOneByItemIdAndStatusAndStartAfterOrderByStartAsc(
+                any(Long.class),
+                any(String.class),
+                any(LocalDateTime.now().getClass()))
+        ).thenReturn(Optional.of(bookingNext));
+
+        assertEquals(itemWideDto, itemService.getItemWithComments(1L, 1L));
+        verify(itemRepository).findItemById(any(Long.class));
+        verify(bookingRepository, atLeastOnce()).findFirstOneByItemIdAndStatusAndEndBeforeOrderByEndDesc(
+                any(Long.class),
+                any(String.class),
+                any(LocalDateTime.now().getClass())
+        );
+        verify(bookingRepository, atLeastOnce()).findFirstOneByItemIdAndStatusAndStartAfterOrderByStartAsc(
+                any(Long.class),
+                any(String.class),
+                any(LocalDateTime.now().getClass())
+        );
+    }
 }

@@ -73,15 +73,15 @@ public class ItemRequestRepositoryTest {
         assertEquals(2, requestsList.size());
 
         assertThat(
-                requestsList.stream().
-                map(ItemRequest::getDescription).
-                toList()
+                requestsList.stream()
+                        .map(ItemRequest::getDescription)
+                        .toList()
         ).contains("findItemRequestListByRequestorId_test1");
 
         assertThat(
-                requestsList.stream().
-                        map(ItemRequest::getDescription).
-                        toList()
+                requestsList.stream()
+                        .map(ItemRequest::getDescription)
+                        .toList()
         ).contains("findItemRequestListByRequestorId_test2");
     }
 
