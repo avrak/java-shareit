@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.exception.model.NotFoundException;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.model.ItemRequest;
-import ru.practicum.shareit.request.service.ItemRequestServiceImpl;
 import ru.practicum.shareit.request.storage.ItemRequestRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
@@ -30,8 +29,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 public class ItemRequestServiceTest {
-    private final static String name = "UserServiceTest";
-    private final static String email = name + "@example.com";
+    private final String name = "UserServiceTest";
+    private final String email = name + "@example.com";
     private final LocalDateTime createdAt = LocalDateTime.now();
 
     User user = new User(1L, name, email);

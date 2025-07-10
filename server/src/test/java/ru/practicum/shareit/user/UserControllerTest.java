@@ -39,7 +39,7 @@ public class UserControllerTest {
     private UserDto userDto;
 
     @BeforeEach
-    void setUp() {
+    void beforeEach() {
         mvc = MockMvcBuilders
                 .standaloneSetup(controller)
                 .build();

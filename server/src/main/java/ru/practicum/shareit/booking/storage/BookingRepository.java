@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Optional;
 
-public interface BookingRepository  extends JpaRepository<Booking, Long> {
+public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Optional<Booking> findBookingById(Long bookingId);
 
