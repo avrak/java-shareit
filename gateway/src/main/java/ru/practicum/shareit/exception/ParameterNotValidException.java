@@ -7,7 +7,7 @@ public class ParameterNotValidException extends RuntimeException {
   private final String reason;
 
   public ParameterNotValidException(String reason) {
-    super("Ошибка ввода");
+    super("Ошибка ввода " + reason);
     this.reason = reason;
   }
 }

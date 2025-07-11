@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.dto;
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,4 +35,14 @@ public class BookingDto {
     UserDto booker;
 
     private BookingState status; // статус бронирования
+
+    @AssertTrue(message = "Дата окончания бронирования должна быть после даты начала")
+    private boolean isEndAfterStart() {
+        return end == null || start == null || end.isAfter(start);
+    }
+
+    @AssertTrue(message = "Дата начала бронирования не может быть в прошлом")
+    private boolean isStartInFuture() {
+        return start == null || start.isAfter(LocalDateTime.now());
+    }
 }

@@ -5,6 +5,8 @@ import java.util.Optional;
 public enum BookingState {
 	// Все
 	ALL,
+	// Подтверждённые
+	APPROVED,
 	// Текущие
 	CURRENT,
 	// Будущие
