@@ -244,6 +244,21 @@ public class ItemServiceTest {
     }
 
     @Test
+    @DisplayName("Сохранить вещь без запроса")
+    void addItem_noRequestId() {
+        when(userRepository.findUserById(any(Long.class))).thenReturn(Optional.of(user));
+        when(itemRepository.save(any(Item.class))).thenReturn(item);
+
+        item.setRequestId(null);
+        item.setRequest(null);
+        itemDto.setRequestId(null);
+        itemDto.setRequest(null);
+
+        assertEquals(itemDto, itemService.addItem(1L, itemDto));
+        verify(userRepository).findUserById(any(Long.class));
+    }
+
+    @Test
     @DisplayName("Сохранить вещь с корректными параметрами")
     void addItem_correctly() {
         when(userRepository.findUserById(any(Long.class))).thenReturn(Optional.of(user));
@@ -298,6 +313,30 @@ public class ItemServiceTest {
         when(itemRepository.save(any(Item.class))).thenReturn(itemUpdated);
 
         assertEquals(itemUpdatedDto, itemService.updateItem(1L, 1L, itemUpdatedDto));
+        verify(itemRepository).findItemById(any(Long.class));
+        verify(itemRepository).save(any(Item.class));
+    }
+
+
+    @Test
+    @DisplayName("Обновить вещь без изменения данных")
+    void updateItem_noUpdates() {
+        ItemDto itemUpdatedDto = new ItemDto();
+        itemUpdatedDto.setId(1L);
+        itemUpdatedDto.setName(null);
+        itemUpdatedDto.setDescription(null);
+        itemUpdatedDto.setOwnerId(1L);
+        itemUpdatedDto.setAvailable(null);
+        itemUpdatedDto.setRequestId(20L);
+
+        when(itemRepository.findItemById(any(Long.class))).thenReturn(Optional.of(item));
+        when(itemRepository.save(any(Item.class))).thenReturn(item);
+
+        ItemDto savedItemDto = itemService.updateItem(1L, 1L, itemUpdatedDto);
+
+        assertEquals(itemDto.getName(), savedItemDto.getName());
+        assertEquals(itemDto.getDescription(), savedItemDto.getDescription());
+        assertEquals(itemDto.getAvailable(), savedItemDto.getAvailable());
         verify(itemRepository).findItemById(any(Long.class));
         verify(itemRepository).save(any(Item.class));
     }
@@ -368,6 +407,12 @@ public class ItemServiceTest {
                 any(String.class),
                 any(LocalDateTime.now().getClass())
         );
+    }
+
+    @Test
+    @DisplayName("Найти вещь по тексту без текста")
+    void getItemListByText_noText() {
+         assertEquals(0, itemService.getItemListByText("").size());
     }
 
     @Test

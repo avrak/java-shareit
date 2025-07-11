@@ -48,6 +48,8 @@ public class UserServiceTest {
     void addUser_withUtilizedEmail() {
         when(userRepository.existsByEmail(userDto.getEmail())).thenReturn(true);
 
+        user.setEmail("other@mail.ru");
+
         assertThrows(ConflictException.class, () -> userService.addUser(userDto));
         verify(userRepository, never()).save(any());
     }
@@ -91,6 +93,19 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Обновить пользователя без изменения данных")
+    void updateUser_noChange() {
+        UserDto updatedUserDto = new UserDto(1L, null, null);
+
+        when(userRepository.findUserById(1L)).thenReturn((Optional.of(user)));
+        when(userRepository.save(any())).thenReturn(user);
+
+        assertEquals(userDto, userService.updateUser(1L, updatedUserDto));
+        verify(userRepository).findUserById(any());
+        verify(userRepository).save(any());
+    }
+
+    @Test
     @DisplayName("Найти пользователя по id")
     void getUserById_thatExists() {
         when(userRepository.findUserById(any())).thenReturn(Optional.of(user));
@@ -112,6 +127,6 @@ public class UserServiceTest {
     @DisplayName("Удалить пользователя")
     void deleteUser_validUser() {
         userRepository.deleteUserById(1L);
-        verify(userRepository).deleteUserById(any());
+        verify(userRepository).deleteUserById(1L);
     }
 }

@@ -19,7 +19,6 @@ import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Service
@@ -32,23 +31,6 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     @Override
     public BookingDto saveBooking(Long userId, BookingDto bookingDto) {
-
-        if (bookingDto.getStart() == null || bookingDto.getEnd() == null) {
-            throw new ParameterNotValidException("Время начала и окончания бронирования должны быть заданы");
-        } else if (bookingDto.getStart().isBefore(LocalDateTime.now())) {
-            throw new ParameterNotValidException("Время начала бронирования не может быть в прошлом");
-        } else if (bookingDto.getEnd().isBefore(LocalDateTime.now())) {
-            throw new ParameterNotValidException("Время окончания бронирования не может быть в прошлом");
-        } else if (bookingDto.getEnd().isBefore(bookingDto.getStart())) {
-            throw new ParameterNotValidException("Время окончания бронирования не может раньше времени начала бронирования");
-        } else if (bookingDto.getEnd().isEqual(bookingDto.getStart())) {
-            throw new ParameterNotValidException("Время окончания бронирования не может совпадать со временем начала бронирования");
-        }
-
-        if (userId == null) {
-            throw new ParameterNotValidException("Не передан автор бронирования");
-        }
-
         User booker = userRepository
                 .findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id=" + bookingDto.getBooker() + " не найден"));

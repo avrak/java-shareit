@@ -11,7 +11,9 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Statuses;
 import ru.practicum.shareit.booking.storage.BookingRepository;
+import ru.practicum.shareit.exception.model.ForbiddenException;
 import ru.practicum.shareit.exception.model.NotFoundException;
+import ru.practicum.shareit.exception.model.ParameterNotValidException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemRepository;
@@ -142,7 +144,20 @@ public class BookingServiceTest {
     }
 
     @Test
-    @DisplayName("Корректное подтверждение бронирования")
+    @DisplayName("Сохранить бронирование с недоступной вещью")
+    void saveBooking_forNonAvailableItem() {
+        when(userRepository.findUserById(any(Long.class))).thenReturn(Optional.of(user));
+        when(itemRepository.findItemById(any(Long.class))).thenReturn(Optional.of(item));
+
+        item.setAvailable(false);
+
+        assertThrows(ParameterNotValidException.class, () -> bookingService.saveBooking(1L, bookingDto));
+        verify(userRepository).findUserById(any(Long.class));
+        verify(itemRepository).findItemById(any(Long.class));
+    }
+
+    @Test
+    @DisplayName("Корректный запрет бронирования")
     void approveBookingById_existingBooking() {
         BookingDto expectedDto = new BookingDto(
                 1L,
@@ -152,13 +167,37 @@ public class BookingServiceTest {
                 1L,
                 itemDto,
                 userDto,
-                Statuses.APPROVED
+                Statuses.REJECTED
         );
 
         when(bookingRepository.findBookingById(any(Long.class))).thenReturn(Optional.of(booking));
         when(itemRepository.findItemById(any(Long.class))).thenReturn(Optional.of(item));
 
-        assertEquals(expectedDto, bookingService.approveBookingById(1L, 1L, true));
+        assertEquals(expectedDto, bookingService.approveBookingById(1L, 1L, false));
+        verify(bookingRepository).findBookingById(any(Long.class));
+        verify(itemRepository).findItemById(any(Long.class));
+        verify(bookingRepository).save(any(Booking.class));
+    }
+
+    @Test
+    @DisplayName("Корректное подтверждение бронирования")
+    void approveBookingById_reject() {
+        BookingDto expectedDto = new BookingDto(
+                1L,
+                booking.getStart(),
+                booking.getEnd(),
+                1L,
+                1L,
+                itemDto,
+                userDto,
+                null
+        );
+
+        when(bookingRepository.findBookingById(any(Long.class))).thenReturn(Optional.of(booking));
+        when(itemRepository.findItemById(any(Long.class))).thenReturn(Optional.of(item));
+
+        assertEquals(Statuses.APPROVED,
+                bookingService.approveBookingById(1L, 1L, true).getStatus());
         verify(bookingRepository).findBookingById(any(Long.class));
         verify(itemRepository).findItemById(any(Long.class));
         verify(bookingRepository).save(any(Booking.class));
@@ -181,6 +220,19 @@ public class BookingServiceTest {
         when(bookingRepository.findBookingById(any(Long.class))).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> bookingService.approveBookingById(1L, 1L, true));
+        verify(bookingRepository).findBookingById(any(Long.class));
+    }
+
+    @Test
+    @DisplayName("Подтверждение бронирования не владельцем вещи")
+    void approveBookingById_byNonOwner() {
+        when(bookingRepository.findBookingById(any(Long.class))).thenReturn(Optional.of(booking));
+        when(itemRepository.findItemById(any(Long.class))).thenReturn(Optional.of(item));
+
+        item.setOwnerId(2L);
+
+        assertThrows(ForbiddenException.class, () -> bookingService.approveBookingById(1L, 1L, true));
+        verify(bookingRepository).findBookingById(any(Long.class));
         verify(bookingRepository).findBookingById(any(Long.class));
     }
 
