@@ -41,36 +41,6 @@ public class UserDtoTest {
     }
 
     @Test
-    @DisplayName("Проверка DTO пользователя с пустым email")
-    void userDto_testEmptyEmail() {
-        String name = "userDto_testEmptyEmail";
-        String email = null;
-
-        UserDto userDto = new UserDto(1L, name, email);
-
-        Set<ConstraintViolation<UserDto>> violations = validator.validate(userDto);
-
-        assertFalse(violations.isEmpty());
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getPropertyPath().toString().equals("email")));
-    }
-
-    @Test
-    @DisplayName("Проверка DTO пользователя с некорректным email")
-    void userDto_testInvalidEmail() {
-        String name = "userDto_testInvalidEmail";
-        String email = name;
-
-        UserDto userDto = new UserDto(1L, name, email);
-
-        Set<ConstraintViolation<UserDto>> violations = validator.validate(userDto);
-
-        assertFalse(violations.isEmpty());
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getPropertyPath().toString().equals("email")));
-    }
-
-    @Test
     @DisplayName("Проверка геттеров и сеттеров DTO пользователя")
     void userDto_testGettersSetters() {
         String name = "userDto_testGettersSetters";

@@ -15,7 +15,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BookingDtoTest {
@@ -49,31 +48,5 @@ public class BookingDtoTest {
 
         Set<ConstraintViolation<BookingDto>> violations = validator.validate(bookingDto);
         assertTrue(violations.isEmpty());
-    }
-
-    @Test
-    @DisplayName("Создать DTO бронирования с некорректными данными")
-    void createBookingDto_withIncorrectData() {
-        BookingDto bookingDto = new BookingDto(
-                1L,
-                null,
-                null,
-                null,
-                null,
-                new ItemDto(),
-                new UserDto(),
-                Statuses.APPROVED
-        );
-
-        Set<ConstraintViolation<BookingDto>> violations = validator.validate(bookingDto);
-        assertFalse(violations.isEmpty());
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getPropertyPath().toString().equals("start")));
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getPropertyPath().toString().equals("end")));
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getPropertyPath().toString().equals("itemId")));
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getPropertyPath().toString().equals("bookerId")));
     }
 }

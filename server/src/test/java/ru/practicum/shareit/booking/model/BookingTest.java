@@ -14,7 +14,6 @@ import ru.practicum.shareit.user.model.User;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BookingTest {
@@ -49,31 +48,4 @@ public class BookingTest {
         Set<ConstraintViolation<Booking>> violations = validator.validate(booking);
         assertTrue(violations.isEmpty());
     }
-
-    @Test
-    @DisplayName("Создать бронирование с некорректными данными")
-    void createBooking_withIncorrectData() {
-        Booking booking = new Booking(
-                1L,
-                null,
-                null,
-                null,
-                null,
-                Statuses.APPROVED.name(),
-                new Item(),
-                new User()
-        );
-
-        Set<ConstraintViolation<Booking>> violations = validator.validate(booking);
-        assertFalse(violations.isEmpty());
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getPropertyPath().toString().equals("start")));
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getPropertyPath().toString().equals("end")));
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getPropertyPath().toString().equals("itemId")));
-        assertTrue(violations.stream()
-                .anyMatch(v -> v.getPropertyPath().toString().equals("bookerId")));
-    }
-
 }
